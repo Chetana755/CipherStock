@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CipherStock - Live Market</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://s3.tradingview.com/tv.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/particlesjs/2.2.3/particles.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1a73e8;
+            --secondary: #4285f4;
+            --accent: #0f9d58;
+            --text: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --danger: #ea4335;
+            --success: #0f9d58;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            color: var(--text);
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        
+        .animated-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -3;
+            background: linear-gradient(-45deg, #0a0a20, #101035, #152a45, #0d2a38);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        
+
+        
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(40px);
+            opacity: 0.3;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .orb1 {
+            background: radial-gradient(circle, rgba(66, 133, 244, 0.7), rgba(26, 115, 232, 0));
+            width: 300px;
+            height: 300px;
+            top: 10%;
+            left: 10%;
+            animation: float 20s infinite alternate ease-in-out;
+        }
+
+        .orb2 {
+            background: radial-gradient(circle, rgba(15, 157, 88, 0.7), rgba(15, 157, 88, 0));
+            width: 250px;
+            height: 250px;
+            bottom: 20%;
+            right: 15%;
+            animation: float 16s infinite alternate-reverse ease-in-out;
+        }
+
+        .orb3 {
+            background: radial-gradient(circle, rgba(234, 67, 53, 0.5), rgba(234, 67, 53, 0));
+            width: 200px;
+            height: 200px;
+            bottom: 10%;
+            left: 20%;
+            animation: float 25s infinite alternate ease-in-out;
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(100px, 50px) scale(1.1); }
+            100% { transform: translate(-50px, 100px) scale(0.9); }
+        }
+
+        
+        .shooting-star {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 4px;
+            height: 4px;
+            background: #fff;
+            border-radius: 50%;
+            box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.1),
+                         0 0 0 8px rgba(255, 255, 255, 0.1),
+                         0 0 20px rgba(255, 255, 255, 1);
+            animation: shooting 3s linear infinite;
+            z-index: -1;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .shooting-star::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 100px;
+            height: 1px;
+            background: linear-gradient(90deg, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0));
+            right: 4px;
+        }
+
+        .shooting-star:nth-child(1) {
+            top: 20%;
+            left: 30%;
+            animation-delay: 0s;
+        }
+
+        .shooting-star:nth-child(2) {
+            top: 60%;
+            left: 80%;
+            animation-delay: 1.5s;
+        }
+
+        .shooting-star:nth-child(3) {
+            top: 40%;
+            left: 40%;
+            animation-delay: 3s;
+        }
+
+        @keyframes shooting {
+            0% { transform: rotate(-45deg) translateX(0) scale(0); opacity: 0; }
+            10%, 15% { opacity: 1; }
+            50% { transform: rotate(-45deg) translateX(1000px) scale(1); opacity: 0; }
+            100% { transform: rotate(-45deg) translateX(1000px) scale(1); opacity: 0; }
+        }
+
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(45deg, var(--primary), var(--accent));
+            font-family: "Orbitron", sans-serif;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 10px rgba(66, 133, 244, 0.3);
+            flex-grow: 0;
+            margin-right: 20px;
+        }
+
+        .search-container {
+            position: relative;
+            flex-grow: 1;
+            max-width: 500px;
+            margin: 0 20px;
+        }
+
+        #searchStock {
+            width: 100%;
+            padding: 12px 20px;
+            font-size: 16px;
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        #searchStock:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.3);
+        }
+
+        #searchBtn {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--primary);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        #searchBtn:hover {
+            background: var(--secondary);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        #dateTime {
+            padding: 8px 15px;
+            border-radius: 20px;
+            color: var(--text-secondary);
+            font-size: 14px;
+            backdrop-filter: blur(5px);
+        }
+
+        section {
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+        }
+
+        section:hover {
+            transform: translateY(-5px);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            position: relative;
+            padding-bottom: 10px;
+            color: var(--text);
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 50px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 3px;
+        }
+
+        .summary-boxes {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .summary-box {
+            padding: 15px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .summary-box:hover {
+            transform: translateY(-3px);
+            border-color: rgba(66, 133, 244, 0.3);
+        }
+
+        .filters {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .filter-btn.active {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white;
+        }
+
+        .stocks-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .stock-item {
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stock-item::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            background: linear-gradient(45deg, #467e96, #076178, #261d65, #404fc2);
+            opacity: 0;
+            z-index: -1;
+            transition: opacity 0.3s ease;
+            border-radius: 10px;
+        }
+
+        .stock-item:hover {
+            transform: translateY(-5px);
+            border-color: rgba(66, 133, 244, 0.3);
+        }
+
+        .stock-item:hover::before {
+            opacity: 0.8;
+        }
+
+        .stock-item.selected {
+            border: 2px solid var(--primary);
+            box-shadow: 0 0 15px rgba(26, 115, 232, 0.5);
+        }
+
+        .stock-item.selected::before {
+            opacity: 0.8;
+        }
+
+        .stock-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stock-price {
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+
+        .stock-change.positive {
+            color: var(--success);
+        }
+
+        .stock-change.negative {
+            color: var(--danger);
+        }
+
+        .stock-chart {
+            height: 600px; 
+            min-height: 600px; 
+            border-radius: 10px;
+            overflow: hidden;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .stock-chart {
+                height: 600px; 
+                min-height: 600px;
+            }
+        }
+
+        #tradingview-widget {
+            width: 100%;
+            height: 100%;
+        }
+
+        .pulse {
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(26, 115, 232, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(26, 115, 232, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(26, 115, 232, 0); }
+        }
+
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            header h1 {
+                margin-bottom: 15px;
+            }
+            
+            .search-container {
+                width: 100%;
+                margin: 15px 0;
+            }
+            
+            #dateTime {
+                margin-top: 15px;
+            }
+            
+            .stock-chart {
+                height: 400px; 
+            }
+        }
+        .spinner {
+            display: none;
+            position: absolute;
+            right: 60px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: translateY(-50%) rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="animated-background"></div>
+    
+    
+    
+    <div class="orb orb1"></div>
+    <div class="orb orb2"></div>
+    <div class="orb orb3"></div>
+    
+   
+    <div class="shooting-star"></div>
+    <div class="shooting-star"></div>
+    <div class="shooting-star"></div>
+
+    <div id="particles-js"></div>
+    
+    <div class="container">
+        <header>
+            <h1> CipherStock</h1>
+            <div class="search-container">
+                <input type="text" id="searchStock" placeholder="Search stocks (e.g., AAPL, MSFT)">
+                <button id="searchBtn">🔍</button>
+            </div>
+            <span id="dateTime"></span>
+        </header>
+
+        <section class="market-summary">
+            <h2>Market Summary</h2>
+            <div class="summary-boxes">
+                <div class="summary-box" id="market1">
+                    <div class="market-name">S&P 500</div>
+                    <div class="market-value">4,189.92</div>
+                    <div class="market-change positive">+24.15 (+0.58%)</div>
+                </div>
+                <div class="summary-box" id="market2">
+                    <div class="market-name">Nasdaq</div>
+                    <div class="market-value">14,101.57</div>
+                    <div class="market-change negative">-78.33 (-0.55%)</div>
+                </div>
+                <div class="summary-box" id="market3">
+                    <div class="market-name">Dow Jones</div>
+                    <div class="market-value">33,259.41</div>
+                    <div class="market-change positive">+125.68 (+0.38%)</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="trending-stocks">
+            <h2>Trending Stocks</h2>
+            <div class="filters">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="gainers">📈 Gainers</button>
+                <button class="filter-btn" data-filter="losers">📉 Losers</button>
+            </div>
+            <div class="stocks-list" id="stocksList">
+                
+            </div>
+        </section>
+
+        <section class="stock-chart">
+            <h2>Stock Chart</h2>
+            <div id="tradingview-widget"></div>
+        </section>
+    </div>
+
+    <script>
+        
+        const FINNHUB_API_KEY = 'cvg3fq9r01qgvsqnb1cgcvg3fq9r01qgvsqnb1d0'; 
+        const FINNHUB_BASE_URL = 'https://finnhub.io/api/v1';
+        
+        function updateDateTime() {
+            const now = new Date();
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric', 
+                hour: '2-digit', 
+                minute: '2-digit',
+                second: '2-digit'
+            };
+            document.getElementById('dateTime').textContent = now.toLocaleDateString('en-US', options);
+        }
+        
+        
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+
+        
+        const stocks = [
+            { symbol: 'AAPL', name: 'Apple Inc.', price: 174.89, change: 2.45, changePercent: 1.42, type: 'gainers' },
+            { symbol: 'MSFT', name: 'Microsoft Corp.', price: 297.27, change: 3.12, changePercent: 1.06, type: 'gainers' },
+            { symbol: 'AMZN', name: 'Amazon.com Inc.', price: 143.05, change: -1.73, changePercent: -1.19, type: 'losers' },
+            { symbol: 'GOOGL', name: 'Alphabet Inc.', price: 131.86, change: 0.91, changePercent: 0.69, type: 'gainers' },
+            { symbol: 'META', name: 'Meta Platforms', price: 327.56, change: -4.32, changePercent: -1.30, type: 'losers' },
+            { symbol: 'TSLA', name: 'Tesla Inc.', price: 234.20, change: 5.78, changePercent: 2.53, type: 'gainers' },
+            { symbol: 'NVDA', name: 'NVIDIA Corp.', price: 429.97, change: 8.21, changePercent: 1.94, type: 'gainers' },
+            { symbol: 'JPM', name: 'JPMorgan Chase', price: 151.45, change: -0.82, changePercent: -0.54, type: 'losers' }
+        ];
+
+        
+        function populateStocks(filter = 'all') {
+            const stocksList = document.getElementById('stocksList');
+            stocksList.innerHTML = '';
+            
+            const filteredStocks = filter === 'all' ? 
+                stocks : 
+                stocks.filter(stock => stock.type === filter);
+            
+            filteredStocks.forEach(stock => {
+                const isPositive = stock.change > 0;
+                const stockItem = document.createElement('div');
+                stockItem.className = 'stock-item';
+                stockItem.dataset.symbol = stock.symbol;
+                
+                stockItem.innerHTML = `
+                    <div class="stock-name">${stock.symbol} - ${stock.name}</div>
+                    <div class="stock-price">$${stock.price.toFixed(2)}</div>
+                    <div class="stock-change ${isPositive ? 'positive' : 'negative'}">
+                        ${isPositive ? '+' : ''}${stock.change.toFixed(2)} (${isPositive ? '+' : ''}${stock.changePercent.toFixed(2)}%)
+                    </div>
+                `;
+                
+                stocksList.appendChild(stockItem);
+            });
+            
+            
+            document.querySelectorAll('.stock-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const symbol = this.dataset.symbol;
+                    updateChart(symbol);
+                    
+                    
+                    document.querySelectorAll('.stock-item').forEach(s => {
+                        s.classList.remove('selected');
+                        s.classList.remove('pulse');
+                    });
+                    this.classList.add('selected');
+                    this.classList.add('pulse');
+                });
+                
+                
+                item.addEventListener('mouseenter', function() {
+                    if (!this.classList.contains('selected')) {
+                        this.style.borderColor = 'rgba(66, 133, 244, 0.3)';
+                    }
+                });
+                
+                item.addEventListener('mouseleave', function() {
+                    if (!this.classList.contains('selected')) {
+                        this.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+                    }
+                });
+            });
+        }
+
+        
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                populateStocks(this.dataset.filter);
+            });
+        });
+
+        
+        function initTradingViewWidget(symbol = 'AAPL') {
+            new TradingView.widget({
+                "width": "100%",
+                "height": "600px",
+                "symbol": `NASDAQ:${symbol}`,
+                "interval": "D",
+                "timezone": "Etc/UTC",
+                "theme": "dark",
+                "style": "1",
+                "locale": "en",
+                "toolbar_bg": "#1e1e1e",
+                "enable_publishing": false,
+                "allow_symbol_change": true,
+                "container_id": "tradingview-widget"
+            });
+        }
+
+        function updateChart(symbol) {
+            document.getElementById('tradingview-widget').innerHTML = '';
+            initTradingViewWidget(symbol);
+        }
+
+        
+        function initParticles() {
+            particlesJS('particles-js', {
+                "particles": {
+                    "number": {
+                        "value": 80,
+                        "density": {
+                            "enable": true,
+                            "value_area": 800
+                        }
+                    },
+                    "color": {
+                        "value": "#1a73e8"
+                    },
+                    "shape": {
+                        "type": "circle",
+                        "stroke": {
+                            "width": 0,
+                            "color": "#000000"
+                        },
+                        "polygon": {
+                            "nb_sides": 5
+                        }
+                    },
+                    "opacity": {
+                        "value": 0.5,
+                        "random": false,
+                        "anim": {
+                            "enable": false,
+                            "speed": 1,
+                            "opacity_min": 0.1,
+                            "sync": false
+                        }
+                    },
+                    "size": {
+                        "value": 3,
+                        "random": true,
+                        "anim": {
+                            "enable": false,
+                            "speed": 40,
+                            "size_min": 0.1,
+                            "sync": false
+                        }
+                    },
+                    "line_linked": {
+                        "enable": true,
+                        "distance": 150,
+                        "color": "#1a73e8",
+                        "opacity": 0.4,
+                        "width": 1
+                    },
+                    "move": {
+                        "enable": true,
+                        "speed": 2,
+                        "direction": "none",
+                        "random": false,
+                        "straight": false,
+                        "out_mode": "out",
+                        "bounce": false,
+                        "attract": {
+                            "enable": false,
+                            "rotateX": 600,
+                            "rotateY": 1200
+                        }
+                    }
+                },
+                "interactivity": {
+                    "detect_on": "canvas",
+                    "events": {
+                        "onhover": {
+                            "enable": true,
+                            "mode": "grab"
+                        },
+                        "onclick": {
+                            "enable": true,
+                            "mode": "push"
+                        },
+                        "resize": true
+                    },
+                    "modes": {
+                        "grab": {
+                            "distance": 140,
+                            "line_linked": {
+                                "opacity": 1
+                            }
+                        },
+                        "bubble": {
+                            "distance": 400,
+                            "size": 40,
+                            "duration": 2,
+                            "opacity": 8,
+                            "speed": 3
+                        },
+                        "repulse": {
+                            "distance": 200,
+                            "duration": 0.4
+                        },
+                        "push": {
+                            "particles_nb": 4
+                        },
+                        "remove": {
+                            "particles_nb": 2
+                        }
+                    }
+                },
+                "retina_detect": true
+            });
+        }
+
+        
+        document.getElementById('searchBtn').addEventListener('click', async function() {
+            const searchTerm = document.getElementById('searchStock').value.trim().toUpperCase();
+            if (!searchTerm) return;
+            
+            
+            const spinner = document.createElement('div');
+            spinner.className = 'spinner';
+            this.parentElement.appendChild(spinner);
+            spinner.style.display = 'block';
+            
+            try {
+                
+                const profileResponse = await fetch(`${FINNHUB_BASE_URL}/stock/profile2?symbol=${searchTerm}&token=${FINNHUB_API_KEY}`);
+                const profileData = await profileResponse.json();
+                
+                if (!profileData.ticker) {
+                    alert(`Stock symbol "${searchTerm}" not found.`);
+                    return;
+                }
+                
+                
+                updateChart(searchTerm);
+                
+               
+                const stockItems = document.querySelectorAll('.stock-item');
+                let found = false;
+                
+                stockItems.forEach(item => {
+                    if (item.dataset.symbol === searchTerm) {
+                        item.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        item.classList.add('selected');
+                        item.classList.add('pulse');
+                        found = true;
+                    } else {
+                        item.classList.remove('selected');
+                        item.classList.remove('pulse');
+                    }
+                });
+                
+                if (!found) {
+                    
+                }
+            } catch (error) {
+                console.error('Search error:', error);
+                alert(`Error searching for "${searchTerm}"`);
+            } finally {
+                
+                spinner.style.display = 'none';
+                spinner.remove();
+            }
+        });
+
+       
+        document.getElementById('searchStock').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('searchBtn').click();
+            }
+        });
+
+        
+        window.addEventListener('DOMContentLoaded', function() {
+            populateStocks();
+            initTradingViewWidget();
+            initParticles();
+            
+            
+            const searchInput = document.getElementById('searchStock');
+            searchInput.addEventListener('focus', function() {
+                this.parentElement.style.transform = 'scale(1.03)';
+                this.parentElement.style.transition = 'all 0.3s ease';
+            });
+            
+            searchInput.addEventListener('blur', function() {
+                this.parentElement.style.transform = 'scale(1)';
+            });
+        });
+    </script>
+</body>
+</html>
