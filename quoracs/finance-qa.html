@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CipherStock Q&A</title>
+    <link rel="stylesheet" href="finance-qa.css">
+    <!-- Font Awesome CDN for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container header-container">
+            <a href="#" class="logo">
+                <i class="fas fa-chart-line"></i>CipherStock Q&A
+            </a>
+            
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search questions...">
+                <button class="search-button"><i class="fas fa-arrow-right"></i></button>
+            </div>
+            
+            <div class="nav-actions">
+                <div class="nav-icon">
+                    <i class="far fa-bell"></i>
+                    <span class="notification-badge">3</span>
+                </div>
+                <div class="nav-icon">
+                    <i class="far fa-envelope"></i>
+                    <span class="notification-badge">5</span>
+                </div>
+                <div class="avatar">YU</div>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Main Content -->
+    <main class="container">
+        <div class="content">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <div class="sidebar-menu glass">
+                    <div class="menu-item active">
+                        <i class="fas fa-home"></i>
+                        <span>Home</span>
+                    </div>
+                    <div class="menu-item">
+                        <i class="far fa-question-circle"></i>
+                        <span>Your Questions</span>
+                    </div>
+                    <div class="menu-item">
+                        <i class="far fa-edit"></i>
+                        <span>Your Answers</span>
+                    </div>
+                    <div class="menu-item">
+                        <i class="far fa-bookmark"></i>
+                        <span>Bookmarks</span>
+                    </div>
+                    <div class="menu-item">
+                        <i class="far fa-user"></i>
+                        <span>Profile</span>
+                    </div>
+                    <div class="menu-item">
+                        <i class="fas fa-cog"></i>
+                        <span>Settings</span>
+                    </div>
+                </div>
+                
+                <!-- Topics Panel -->
+                <div class="topics-panel glass">
+                    <div class="topics-header">
+                        Popular Topics
+                    </div>
+                    <div class="topic-item">
+                        <div class="topic-tag">Stock Investing</div>
+                        <div class="topic-posts">2,418 questions</div>
+                    </div>
+                    <div class="topic-item">
+                        <div class="topic-tag">Cryptocurrency</div>
+                        <div class="topic-posts">1,892 questions</div>
+                    </div>
+                    <div class="topic-item">
+                        <div class="topic-tag">Retirement Planning</div>
+                        <div class="topic-posts">1,654 questions</div>
+                    </div>
+                    <div class="topic-item">
+                        <div class="topic-tag">Market Analysis</div>
+                        <div class="topic-posts">1,245 questions</div>
+                    </div>
+                    <div class="topic-item">
+                        <div class="topic-tag">Financial Advisors</div>
+                        <div class="topic-posts">983 questions</div>
+                    </div>
+                </div>
+            </aside>
+            
+            <!-- Q&A Feed -->
+            <section class="qa-feed">
+                <!-- Ask Question -->
+                <div class="ask-question glass">
+                    <div class="question-header">
+                        <i class="far fa-question-circle"></i>
+                        <h3>Ask a Question</h3>
+                    </div>
+                    <textarea id="newQuestionContent" class="question-input" placeholder="What would you like to know about finance or investing?"></textarea>
+                    <div class="question-options">
+                        <div class="topic-select">
+                            <label for="questionTopic">Topic:</label>
+                            <select id="questionTopic">
+                                <option value="investing">Investing</option>
+                                <option value="stocks">Stocks</option>
+                                <option value="crypto">Cryptocurrency</option>
+                                <option value="retirement">Retirement Planning</option>
+                                <option value="market">Market Analysis</option>
+                                <option value="advisors">Financial Advisors</option>
+                            </select>
+                        </div>
+                        <button id="submitQuestion" class="question-submit">Post Question</button>
+                    </div>
+                </div>
+                
+                <!-- Feed Filters -->
+                <div class="feed-filters glass">
+                    <div class="filter-badge active">All Questions</div>
+                    <div class="filter-badge">Answered</div>
+                    <div class="filter-badge">Unanswered</div>
+                    <div class="filter-badge">Most Votes</div>
+                    <div class="filter-badge">Newest</div>
+                </div>
+                
+                <!-- Question Template (hidden) -->
+                <template id="question-template">
+                    <div class="question-card glass">
+                        <div class="question-header">
+                            <div class="question-avatar">
+                                <span>AJ</span>
+                            </div>
+                            <div class="question-author">
+                                <div class="author-name">Alex Johnson</div>
+                                <div class="author-details">Financial Analyst · 2h ago</div>
+                            </div>
+                            <div class="question-votes">
+                                <div class="vote-button upvote">
+                                    <i class="fas fa-chevron-up"></i>
+                                </div>
+                                <div class="vote-count">24</div>
+                                <div class="vote-button downvote">
+                                    <i class="fas fa-chevron-down"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="question-title">
+                            What are the best strategies for dividend investing in the current market?
+                        </div>
+                        <div class="question-content">
+                            I'm looking for advice on building a dividend portfolio that can generate stable income while also providing some growth opportunity. Which sectors and specific companies would you recommend focusing on right now?
+                        </div>
+                        <div class="question-tags">
+                            <span class="tag">Investing</span>
+                            <span class="tag">Dividends</span>
+                            <span class="tag">Stocks</span>
+                        </div>
+                        <div class="question-stats">
+                            <div class="stat">
+                                <i class="far fa-eye"></i>
+                                <span>328 views</span>
+                            </div>
+                            <div class="stat">
+                                <i class="far fa-comment"></i>
+                                <span>5 answers</span>
+                            </div>
+                        </div>
+                        <div class="question-actions">
+                            <button class="action-button answer-button">
+                                <i class="far fa-edit"></i>
+                                <span>Answer</span>
+                            </button>
+                            <button class="action-button follow-button">
+                                <i class="far fa-bookmark"></i>
+                                <span>Follow</span>
+                            </button>
+                            <button class="action-button share-button">
+                                <i class="far fa-share-square"></i>
+                                <span>Share</span>
+                            </button>
+                        </div>
+                        <div class="answers-container">
+                            <div class="answer-count">
+                                <h4>5 Answers</h4>
+                                <div class="answer-sort">
+                                    <span>Sort By:</span>
+                                    <select class="sort-dropdown">
+                                        <option value="votes">Votes</option>
+                                        <option value="recent">Recent</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="answers-list">
+                                <!-- Answers will be dynamically added here -->
+                            </div>
+                            <div class="answer-form hidden">
+                                <textarea class="answer-input" placeholder="Write your answer..."></textarea>
+                                <div class="answer-actions">
+                                    <button class="cancel-answer">Cancel</button>
+                                    <button class="submit-answer">Submit Answer</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- Answer Template (hidden) -->
+                <template id="answer-template">
+                    <div class="answer">
+                        <div class="answer-header">
+                            <div class="answer-avatar">
+                                <span>SL</span>
+                            </div>
+                            <div class="answer-author">
+                                <div class="author-name">Sarah Lee</div>
+                                <div class="author-details">Investment Advisor · 1h ago</div>
+                            </div>
+                            <div class="answer-votes">
+                                <div class="vote-button upvote">
+                                    <i class="fas fa-chevron-up"></i>
+                                </div>
+                                <div class="vote-count">12</div>
+                                <div class="vote-button downvote">
+                                    <i class="fas fa-chevron-down"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="answer-content">
+                            For dividend investing in the current market, I recommend focusing on these sectors:
+                            <ul>
+                                <li><strong>Utilities:</strong> Companies like NextEra Energy (NEE) that combine renewable energy growth with stable dividends</li>
+                                <li><strong>Consumer Staples:</strong> Procter & Gamble (PG) and Coca-Cola (KO) have decades of dividend growth</li>
+                                <li><strong>Healthcare:</strong> Johnson & Johnson (JNJ) and Pfizer (PFE) offer both value and yield</li>
+                            </ul>
+                            Consider a 60/40 split between dividend aristocrats and dividend growth stocks to balance immediate income with long-term appreciation.
+                        </div>
+                        <div class="answer-actions">
+                            <button class="action-button comment-button">
+                                <i class="far fa-comment"></i>
+                                <span>Comment</span>
+                            </button>
+                            <button class="action-button share-button">
+                                <i class="far fa-share-square"></i>
+                                <span>Share</span>
+                            </button>
+                        </div>
+                    </div>
+                </template>
+                
+                <!-- Questions will be dynamically added here -->
+                <div id="questionsContainer"></div>
+            </section>
+        </div>
+    </main>
+    
+    <script src="finance-qa.js"></script>
+</body>
+</html>
