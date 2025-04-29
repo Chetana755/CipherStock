@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cipher Stock</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js"></script>
+ 
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Orbitron', sans-serif;
+        }
+        body {
+            background-color: #0a0f29;
+            color: white;
+            text-align: center;
+        }
+        #particles-js {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1; /* Keep it behind other content */
+            
+        }
+        /* Chatbot Floating Button */
+        #chatbot {
+        position: fixed;
+        bottom: 40px;
+        right: 40px;
+        width: 130px;
+        height: 130px;
+        cursor: pointer;
+        z-index: 1000;
+        }
+
+        #chat-icon {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        }
+
+        /* Chat Popup */
+        #chat-popup {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 65vw;
+        height: 65vh;
+        background-color: #0a0a0a;
+        border: 2px solid #00f0ff;
+        border-radius: 15px;
+        z-index: 2000;
+        box-shadow: 0 0 20px #00f0ff;
+        padding: 1rem;
+        }
+
+        #chat-popup iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        border-radius: 12px;
+        }
+
+        .close-btn {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        font-size: 1.5rem;
+        color: white;
+        cursor: pointer;
+        z-index: 3000;
+        }
+
+
+        .container {
+            width: 80%;
+            margin: auto;
+            padding-top: 50px;
+        }
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #3a86ff;
+        }
+        .menu {
+            display: flex;
+            gap: 20px;
+        }
+        .menu a {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+        }
+        .hero {
+            margin-top: 50px;
+        }
+        .hero h1 {
+            font-size: 100px;
+            font-weight: bold;
+            color: #3a86ff;
+            text-shadow: 0px 0px 20px #3a86ff;
+        }
+        .hero h2 {
+            font-size: 36px;
+            color: white;
+            margin-bottom: 20px;
+        }
+        .hero p {
+            font-size: 20px;
+            max-width: 700px;
+            margin: auto;
+            color: #bbbbbb;
+        }
+        .shop-btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 15px 30px;
+            background-color: #3a86ff;
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            border-radius: 30px;
+            text-decoration: none;
+            box-shadow: 0px 0px 15px #3a86ff;
+        }
+        .shop-btn:hover {
+            background-color: #265fd6;
+            box-shadow: 0px 0px 25px #265fd6;
+        }
+        .abstract-elements {
+            position: absolute;
+            right: 50px;
+            bottom: 100px;
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, #3a86ff, transparent);
+            border-radius: 50%;
+            box-shadow: 0px 0px 50px #3a86ff;
+        }
+        .video-section, .trading-container, .features-section, .disclaimer-container {
+            padding-top: 6rem;
+        }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            max-width: 900px;
+            margin: auto;
+            margin-top: 30px;
+        }
+        .feature-box {
+            background: rgba(94, 101, 231, 0.636);
+            padding: 50px;
+            border-radius: 15px;
+            box-shadow: 0px 0px 15px rgba(83, 120, 230, 0.67);
+            font-size: 22px;
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform .8s ease-in-out;
+            cursor: pointer;
+            border: 1px solid #0c143f;
+        }
+        .feature-box img {
+            max-width: 100px;
+            margin-bottom: 10px;
+        }
+        .feature-box:hover{
+            transform: rotateY(180deg);
+        }
+        .feature-box .back {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 20px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform: rotateY(180deg);
+            backface-visibility: hidden;
+            color: #ffffff;
+            text-align: center;
+            font-weight: 500;
+            text-decoration: none;
+        }
+        .trading-container {
+            height: 500px;
+        }
+        .video-container iframe {
+            width: 80%;
+            height: 400px;
+        }
+        .disclaimer-container {
+        background-color: #0a0a0a;
+        padding: 2rem 1.5rem;
+        border-top: 2px solid #002aff87;
+        max-width: 80%;
+        margin:10vh auto 0 auto;
+        text-align: center;
+        border-radius: 12px;
+        box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
+        margin-top: 12rem;
+        }
+
+        .disclaimer-title {
+        font-size: 2rem;
+        margin-bottom: 1.2rem;
+        color: #ffffff;
+        
+        }
+
+        .disclaimer-text {
+        font-size: 1.1rem;
+        line-height: 1.8;
+        color: #f7f7f7;
+        margin-bottom: 1rem;
+        text-shadow: 0 0 4px #001effb3;
+        }
+
+        .fibo-highlight {
+        color: #00f0ff;
+        font-weight: 600;
+        text-shadow: 0 0 6px #00f0ff;
+        }
+        #chat-popup {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        width: 65vw;
+        height: 65vh;
+        transform: translate(-50%, -50%);
+        background: #0a0a0a;
+        box-shadow: 0 0 20px rgba(0, 240, 255, 0.5);
+        z-index: 9999;
+        border-radius: 16px;
+        overflow: hidden;
+        }
+
+        .chat-popup-content {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        }
+
+        .chat-popup-content iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        }
+
+        #close-popup {
+        position: absolute;
+        top: 8px;
+        right: 16px;
+        font-size: 24px;
+        color: #fff;
+        cursor: pointer;
+        z-index: 10000;
+        }
+        #chat-popup.fullscreen {
+        width: 100vw;
+        height: 100vh;
+        border-radius: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        margin: 0;
+        }
+
+        .fullscreen-btn {
+        position: absolute;
+        top: 10px;
+        right: 50px; /* Adjust as needed to avoid overlapping the ✖ button */
+        font-size: 20px;
+        color: white;
+        cursor: pointer;
+        z-index: 10000;
+        }
+        .sdg-section {
+        background: #000000;
+        padding: 4rem 2rem;
+        margin-top: 12rem;
+        text-align: left;
+        }
+
+        .sdg-title {
+        text-align: center;
+        font-size: 2.5rem;
+        margin-bottom: 3rem;
+        color: #333;
+        text-shadow: 0 0 4px rgba(0, 174, 255, 0.3);
+        }
+
+        .sdg-content {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 3rem;
+        flex-wrap: wrap;
+        }
+
+        .sdg-image img {
+        max-width: 350px;
+        border-radius: 15px;
+        box-shadow: 0 0 20px rgba(0, 174, 255, 0.3);
+        }
+
+        .sdg-text {
+        max-width: 1000px;
+        font-size: 1.1rem;
+        line-height: 1.8;
+        color: #fffdfd;
+        }
+
+        .sdg-text h3 {
+        font-size: 1.8rem;
+        margin-bottom: 1rem;
+        color: #007acc;
+        }
+
+        
+
+
+    </style>
+</head>
+<body>
+    <div id="particles-js"></div>
+    <div class="container">
+        <div class="navbar">
+            <div class="logo">ASTER</div>
+            <div class="menu">
+                
+                <a style="font-size: 12px;" href="#">HOME</a>
+                <a style="font-size: 12px;"href="twit.html">BLOG</a>
+                <a style="font-size: 12px;"href="quoracs/finance-qa.html">QUERIES</a>
+                <a style="font-size: 12px;"href="i.html">RISK ANALYSIS</a>
+                <a style="font-size: 12px;"href="news.html">FINTECH NEWS</a>
+            </div>
+        </div>
+        <div class="hero">
+            <h2>WELCOME TO</h2>
+            <h1>CIPHER STOCK</h1>
+            <p>CipherStock — your one and only market buddy.
+                Got questions? Let FIBO, your friendly financial bot, sort them out.</p>
+            <a href="#" class="shop-btn" id="exploreBtn">Explore Features</a>
+        </div>
+    </div>
+    <div class="abstract-elements"></div>
+    <div id="chatbot" onclick="openChatPopup()">
+
+        <img src="./Screenshot_2025-03-27_164427-removebg-preview.png" alt="Chat" id="chat-icon">
+    </div>
+    <div id="chat-popup">
+        <span class="close-btn" onclick="closeChatPopup()">✖</span>
+        
+        <span class="fullscreen-btn" onclick="redirectToFullChat()">⛶</span>
+
+
+        <iframe src="fibo.html" frameborder="0"></iframe>
+      </div>
+    <section id="disclaimer" class="disclaimer-container">
+        <h2 class="disclaimer-title">Disclaimer</h2>
+        <p class="disclaimer-text">
+          This website is built to make your investing journey smarter and more interactive. From real-time sentiment checks to detailed historical insights, we've designed features that can help you explore and evaluate stocks with more confidence.
+        </p>
+        <p class="disclaimer-text">
+          If you ever feel lost or spot unfamiliar terms, check out our <span class="fibo-highlight">FIBO (FinancialQueryBot)</span>. It’s your go-to glossary and guide throughout the site.
+        </p>
+        <p class="disclaimer-text">
+          Keep exploring, keep learning — and let insights fuel your decisions.
+        </p>
+    </section>
+      
+      
+      
+    <!-- Trading Awareness Video -->
+    <section class="video-section">
+        <h2>Trading Awareness</h2>
+        <div class="video-container">
+            <iframe src="https://www.youtube.com/embed/Xn7KWR9EOGQ" allowfullscreen></iframe>
+        </div>
+    </section>
+    
+      
+    <!-- Features Section -->
+    <section class="features-section" id="features">
+        <h2>Features</h2>
+        <div class="features-grid">
+            <div class="feature-box">
+                <img src="https://cdn-icons-png.flaticon.com/512/3068/3068529.png" alt="Chat Bot">
+                <div href="i.html" class="back">risk analysis-uses both sentiment analysis and historical analysis to assist you in training</div>
+            </div>
+            <div class="feature-box">
+                <img src="./Screenshot_2025-03-23_172912-removebg-preview.png"alt="Blog">
+                <a href="twit.html" class="back">A finance blog bringing you real insights, smart strategies, and market stories from those who live it daily</a>
+            </div>
+            <div class="feature-box">
+                <img src="https://vectorified.com/images/query-icon-35.png" alt="Queries">
+                <a href="quoracs/finance-qa.html"class="back">Get insights and answers from real-world finance professionals. Learn smart, invest smarter.</a>
+            </div>
+            <div class="feature-box">
+                <img src="./Screenshot_2025-03-23_185906-removebg-preview.png" alt="News">
+                <a href="news.html" class="back">Real-time news, smart analysis, and market impact — all at your fingertips.</a>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Stock Analysis -->
+    <section class="trading-container">
+        <h2>Stock Analysis</h2>
+        <div id="tradingview-widget" style="height: 500px;"></div>
+    </section>
+    <section class="sdg-section">
+        
+        <div class="sdg-content">
+          <div class="sdg-image">
+            <img src="https://tse4.mm.bing.net/th?id=OIP.liiRNQYow5V6lPJNn3OWLQHaHa&pid=Api&P=0&h=180" alt="SDG 4: Quality Education">
+          </div>
+          <div class="sdg-text">
+            <h3>Goal 4: Quality Education</h3>
+            <p>
+              We aim to fulfill Sustainable Development Goal 4: Quality Education, which focuses on ensuring inclusive and equitable education for all.
+            </p>
+            <p>
+              Our platform provides AI-powered financial education tools that simplify investment learning for everyone — from students to beginners. With intuitive modules and real-time simulations, users can understand finance without prior knowledge.
+            </p>
+            <p>
+              By promoting accessible financial literacy, we're creating a world where quality education extends into economic empowerment and decision-making.
+            </p>
+          </div>
+        </div>
+      </section>
+      
+      
+      
+    
+    <script>
+        function loadTradingView() {
+            let script = document.createElement('script');
+            script.type = 'text/javascript';
+            script.src = "https://s3.tradingview.com/tv.js";
+            script.onload = function() {
+                new TradingView.widget({
+                    "container_id": "tradingview-widget",
+                    "width": "100%",
+                    "height": "500",
+                    "symbol": "NASDAQ:AAPL",
+                    "interval": "D",
+                    "timezone": "Etc/UTC",
+                    "theme": "dark",
+                    "style": "1",
+                    "locale": "en",
+                    "toolbar_bg": "#f1f3f6",
+                    "enable_publishing": false,
+                    "allow_symbol_change": true,
+        });
+            };
+            document.body.appendChild(script);
+        }
+       
+        window.onload = loadTradingView;
+
+        document.getElementById("chat-icon").addEventListener("click", function () {
+        document.getElementById("chat-popup").style.display = "block";
+        });
+
+        function closeChatPopup() {
+            document.getElementById("chat-popup").style.display = "none";
+        }
+        
+        particlesJS("particles-js", {
+            "particles": {
+                "number": {
+                    "value": 100, 
+                    "density": {
+                        "enable": true, 
+                        "value_area": 800 
+                    }
+                },
+                "color": { "value": "#ffffff" },
+                "shape": {
+                    "type": "circle",
+                    "stroke": { "width": 0, "color": "#000000" }
+                },
+                "opacity": {
+                    "value": 0.3,
+                    "random": true
+                },
+                "size": {
+                    "value": 3,
+                    "random": true
+                },
+                "line_linked": {
+                    "enable": true,
+                    "distance": 150,
+                    "color": "#ffffff",
+                    "opacity": 0.4,
+                    "width": 1
+                },
+                "move": {
+                    "enable": true,
+                    "speed": 2,
+                    "direction": "none",
+                    "random": false,
+                    "straight": false,
+                    "out_mode": "out",
+                    "bounce": false
+                }
+            },
+            "interactivity": {
+                "detect_on": "window",
+                "events": {
+                    "onhover": {
+                        "enable": true,
+                        "mode": "repulse"
+                    },
+                    "onclick": {
+                        "enable": true,
+                        "mode": "push"
+                    },
+                    "resize": true
+                },
+                "modes": {
+                    "grab": {
+                        "distance": 400,
+                        "line_linked": { "opacity": 1 }
+                    },
+                    "bubble": {
+                        "distance": 400,
+                        "size": 10,
+                        "duration": 2,
+                        "opacity": 8
+                    },
+                    "repulse": {
+                        "distance": 200,
+                        "duration": 0.4
+                    },
+                    "push": {
+                        "particles_nb": 5
+                    },
+                    "remove": {
+                        "particles_nb": 2
+                    }
+                }
+            },
+            "retina_detect": true
+        });
+
+        function redirectToFullChat() {
+        window.location.href = "fibo.html"; // make sure the path is correct
+        }
+
+        document.getElementById("exploreBtn").addEventListener("click", function(e) {
+            e.preventDefault(); // Prevent the default anchor jump
+            document.getElementById("features").scrollIntoView({ behavior: "smooth" });
+        });
+
+    </script>
+</body>
+</html>
